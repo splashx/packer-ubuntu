@@ -8,14 +8,14 @@
     "iso_checksum": "655d1ec0a7415b4d963e7f2c40e3d56bd135907dda2cedd0c75209ced3a63103",
     "iso_checksum_type": "sha256",
     "boot_command": "<tab><wait><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>/linux initrd=/initrd.gz auto=true noapic=true fb=false hostname=localhost locale=en_US keyboard-configuration/modelcode=SKIP",
-    "boot_wait": "60s",
+    "boot_wait": "5s",
     "disk_size": "8192",
     "http_directory": "http",
     "ssh_username": "root",
     "ssh_password": "packer",
     "ssh_wait_timeout": "3600s",
     "shutdown_command": "shutdown -P now",
-    "headless": "true"
+    "headless": "false"
   },
   "builders": [
     {
@@ -67,7 +67,12 @@
       "ssh_password": "{{user `ssh_password`}}",
       "ssh_wait_timeout": "{{user `ssh_wait_timeout`}}",
       "shutdown_command": "{{user `shutdown_command`}}",
-      "headless": "{{user `headless`}}"
+      "headless": "{{user `headless`}}",
+      "output_directory": "xxx",
+      "qemuargs": [
+    			[ "-m", "1024M" ]
+       ],
+      "accelerator": "kvm"
     }
   ],
   "provisioners": [
@@ -89,46 +94,5 @@
     }
   ],
   "post-processors": [
-    [
-      {
-        "type": "vagrant",
-        "vagrantfile_template": "vagrantfile.template",
-        "keep_input_artifact": false
-      },
-      {
-        "type": "atlas",
-        "only": ["vmware-iso"],
-        "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
-        "artifact_type": "vagrant.box",
-        "metadata": {
-          "provider": "vmware_desktop",
-          "version": "{{user `version`}}"
-        }
-      },
-      {
-        "type": "atlas",
-        "only": ["qemu"],
-        "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
-        "artifact_type": "vagrant.box",
-        "metadata": {
-          "provider": "libvirt",
-          "version": "{{user `version`}}"
-        }
-      },
-      {
-        "type": "atlas",
-        "only": ["virtualbox-iso"],
-        "artifact": "{{user `atlas_username`}}/{{user `atlas_name`}}",
-        "artifact_type": "vagrant.box",
-        "metadata": {
-          "provider": "virtualbox",
-          "version": "{{user `version`}}"
-        }
-      }
-    ]
-  ],
-  "push": {
-    "name": "{{user `atlas_username`}}/{{user `atlas_name`}}",
-    "vcs": true
-  }
+  ]
 }
